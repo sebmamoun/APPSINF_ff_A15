@@ -120,4 +120,6 @@ app.use(session({
             return res.status(500).send("Erreur serveur, veuillez réessayer plus tard.");
         }
     })
+
+    app.listen(8080);
 })();
