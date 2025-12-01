@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>MyProt - Connexion</title>
+        <link rel="styelsheet" href="/css/style.css">
+        <script src="/scripts/connexion.js" defer></script>
+    </head>
+    <body>
+        <header>
+            <nav></nav>
+        </header>
+        <main>
+            <section class="login">
+                <form action="/login" method="post"></form>
+                    <label for="username-login">Nom d'utilisateur</label>
+                    <input type="text" id="username-login" name="username">
+                    <label for="password-login">Mot de passe</label>
+                    <input type="text" id="password-login" name="password">
+                    <input type="submit" value="Connexion">
+                    <button id="login-switch"></button>
+                </form>
+            </section>
+
+            <section class="register">
+                <form action="/register" method="post" >
+                    <label for="username-register">Nom d'utilisateur</label>
+                    <input type="text" id="username-register" name="username">
+                    <label for="email-register">Adresse e-mail</label>
+                    <input type="email" id="email-register" name="email">
+                    <label for="password-register">Mot de passe</label>
+                    <input type="text" id="password-register" name="password">
+                    <input type="submit" value="S'enregistrer">
+                    <button id="register-switch"></button>
+                </form>
+            </section>
+        </main>
+        <footer>&copy; MyProt 2025</footer>
+    </body>
+</html>
