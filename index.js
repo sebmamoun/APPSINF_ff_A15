@@ -64,4 +64,6 @@ app.use(session({
     })
 
     // ####### POST REQUESTS #######
+
+    app.listen(8080);
 })();
