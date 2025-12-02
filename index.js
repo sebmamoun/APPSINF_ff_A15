@@ -1,10 +1,12 @@
 var express = require("express");
 var session = require("express-session");
 var { MongoClient } = require("mongodb").MongoClient;
+var mongoose = require("mongoose");
 var path = require("path");
 var bodyParser = require("body-parser");
 var bcrypt = require("bcrypt");
 var validator = require("validator");
+const { name } = require("ejs");
 
 var app = express()
 app.set("view engine", "ejs");
@@ -26,31 +28,28 @@ app.use(session({
 }));
 
 (async () => {
-    let users;
-    let foods;
-
-
     // CONNECTION TO THE DATABASE, CREATION OF 2 COLLECTION AND SETTING 2 COLUMN SORT BY CROISSANT ORDER
     try {
-        const client = new MongoClient('mongodb://localhost:27017');
-        await client.connect();
-        const db = client.db('a10_final');
+        mongoose.connect('mongodb://localhost:27017/a15');
 
-        users = db.collection("users");
-        await users.createIndex(
-            {username:1}, 
-            {unique:true, 
-                collation: {
-                    locale:"fr",
-                    strength:2 // ACCENTS SENSIBILITY
-                }
-            });
+        const userSchema = new mongoose.Schema({
+            username:String,
+            email:String,
+            hash:String
+        });
+        const User = mongoose.model('User', userSchema);
 
-        foods = db.collection("foods");
-        await foods.createIndex({name : 1});
+        const foodSchema = new mongoose.Schema({
+            name:String,
+            description:String,
+            price:Number,
+            prot:Number,
+            lastUpdate: {type:Date, default:Date.now}
+        });
+        const Food = mongoose.model('Food', foodSchema);
 
     } catch (error) {
-        console.log("Database error while connection : ", error)
+        console.log("Database error while connection : ", error);
     }
 
     // ####### MIDDLEWARES #######
@@ -85,21 +84,26 @@ app.use(session({
                 return res.status(400).send("Veuillez fournir une adresse email valide.");
             }
 
-            const hash = await bcrypt.hash(password, 12);
-
             const usernameClean = username.trim().toLowerCase();
 
-            const userData = await users.insertOne({
-                usernameClean, 
-                email, 
-                password : hash, 
-                createdAt : new Date()
-            });
+            // Username check
+            const existingUser = User.findOne({usernameClean});
+            if (existingUser) {
+                return res.status(400).send("Nom d'utilisateur déjà pris.");
+            }
+
+            // Hashing the password to increase security
+            const hash = await bcrypt.hash(password, 12);
+
+            // Saving the user informations into the database
+            const newUser = User ({username, email, hash});
+            await newUser.save();
             
+            // Saving some user informations into the session
             req.session.user = {
                 id : userData.insertedId, 
-                username, 
-                email
+                username: username, 
+                email: email
             };
             res.redirect("/");
 
@@ -115,6 +119,27 @@ app.use(session({
     app.post("/login", async(req, res) => {
         try {
             
+            const { username, password} = req.body;
+            if (!username || !password) return res.status(400).send("Veuillez remplir tous les champs.");
+            
+            const usernameClean = username.trim().toLowerCase();
+            const userFound =  await User.findOne({usernameClean});
+            if (!user) {
+                return res.status(400).send("Nom d'utilisateur ou mot de passe incorrect.");
+            }
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) {
+                return res.status(400).send("Nom d'utilisateur ou mot de passe incorrect.");
+            }
+            
+            req.session.user = {
+                id: userFound.insertedId,
+                username: username,
+                email: userFound.email,
+            };
+            
+            return res.redirect("/");
+
         } catch (error) {
             console.log("Error while login into ", username, " with the error : ", error);
             return res.status(500).send("Erreur serveur, veuillez réessayer plus tard.");
