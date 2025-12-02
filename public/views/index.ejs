@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/styles/style.css">
+    <title>MyProt</title>
+</head>
+
+<body>
+    </head>
+
+    <body>
+        <div class="toppage">
+            <p id="ajout_ali"><a href="aliment">ajouter un aliment</a></p>
+            <p id="date">Date: <%= date %>
+            </p>
+        </div>
+        <table id="aliments-table">
+            <tr>
+                <th>Description</th>
+                <th>Proteine</th>
+                <th>Ajouté par</th>
+                <th>Date</th>
+            </tr>
+
+            <% aliments.forEach(incident=> { %>
+                <tr>
+                    <td>
+                        <%= aliments.description %>
+                    </td>
+                    <td>
+                        <%= aliments.proteine %>
+                    </td>
+                    <td>
+                        <%= aliments.ajoute_par %>
+                    </td>
+                    <td>
+                        <%= new Date(incident.date).toLocaleDateString("fr-FR") %>
+                    </td>
+                </tr>
+                <% }) %>
+        </table>
+
+        <script>
+            // Je sélectionne l'input de recherche dans la barre en haut
+            const searchInput = document.querySelector('.search-container .input');
+
+            // Je récupère le tableau des accidents (par son id)
+            const table = document.getElementById('aaliment-table');
+
+            // Puis je prends toutes les lignes (tr) du tableau
+            const rows = table.getElementsByTagName('tr');
+
+            // À chaque fois que je tape quelque chose dans la barre de recherche...
+            searchInput.addEventListener('input', () => {
+
+                // Je récupère le texte tapé et je le mets en minuscule
+                // (comme ça, la recherche n’est pas sensible aux majuscules)
+                const filter = searchInput.value.toLowerCase();
+
+                // Je parcours toutes les lignes du tableau
+                // (je commence à 1 pour sauter la ligne d’en-tête)
+                for (let i = 1; i < rows.length; i++) {
+
+                    // Je récupère toutes les cellules (td) de la ligne actuelle
+                    const cells = rows[i].getElementsByTagName('td');
+                    let match = false; // je prépare un indicateur pour savoir si la ligne correspond
+
+                    // Je parcours toutes les cellules de la ligne
+                    for (let j = 0; j < cells.length; j++) {
+                        // Je récupère le texte de la cellule en minuscule
+                        const text = cells[j].textContent.toLowerCase();
+
+                        // Si le texte contient ce que j’ai tapé, je garde cette ligne
+                        if (text.includes(filter)) {
+                            match = true;
+                            break; // pas besoin de continuer sur les autres cellules
+                        }
+                    }
+
+                    // Si la ligne correspond à la recherche, je l’affiche
+                    // sinon je la cache
+                    rows[i].style.display = match ? '' : 'none';
+                }
+            });
+        </script>
+
+
+    </body>
+
+</html>
