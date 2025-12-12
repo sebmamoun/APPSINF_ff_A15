@@ -65,8 +65,18 @@ app.use(session({
 
     // ####### GET REQUESTS #######
     app.get("/", (req, res) => {
-        return res.render("home");
-    })
+        try {
+            const foodsList = await foods.find({}).toArray();
+            return res.render("home", { foods: foodsList });
+        } catch (error) {
+            console.log("Database error while fetching foods : ", error);
+            return res.render("home", { foods: [] });
+        }
+    });
+
+    app.get("/account", (req, res) => {
+        res.render("account", { error: null });
+    });
 
     // ####### POST REQUESTS #######
 
