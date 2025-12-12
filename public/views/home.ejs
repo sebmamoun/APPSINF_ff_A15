@@ -7,11 +7,6 @@
 </head>
 
     <body>
-        <div class="toppage">
-            <p id="ajout_ali"><a href="aliment">ajouter un aliment</a></p>
-            <p id="date">Date: <%= date %>
-            </p>
-        </div>
         <table id="aliments-table">
             <tr>
                 <th>Description</th>
@@ -20,16 +15,16 @@
                 <th>Date</th>
             </tr>
 
-            <% aliments.forEach(incident=> { %>
+            <% foods.forEach(incident=> { %>
                 <tr>
                     <td>
-                        <%= aliments.description %>
+                        <%= foods.description %>
                     </td>
                     <td>
-                        <%= aliments.proteine %>
+                        <%= foods.proteine %>
                     </td>
                     <td>
-                        <%= aliments.ajoute_par %>
+                        <%= foods.ajoute_par %>
                     </td>
                     <td>
                         <%= new Date(incident.date).toLocaleDateString("fr-FR") %>
