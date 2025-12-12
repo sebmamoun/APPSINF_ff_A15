@@ -27,6 +27,9 @@ app.use(session({
     }
 }));
 
+let User;
+let Food;
+
 (async () => {
     // CONNECTION TO THE DATABASE, CREATION OF 2 COLLECTION AND SETTING 2 COLUMN SORT BY CROISSANT ORDER
     try {
@@ -37,16 +40,19 @@ app.use(session({
             email:String,
             hash:String
         });
-        const User = mongoose.model('User', userSchema);
+        User = mongoose.model('User', userSchema);
 
         const foodSchema = new mongoose.Schema({
             name:String,
             description:String,
             price:Number,
             prot:Number,
+            glucides:Number,
+            lipides:Number,
+            calories:Number,
             lastUpdate: {type:Date, default:Date.now}
         });
-        const Food = mongoose.model('Food', foodSchema);
+        Food = mongoose.model('Food', foodSchema);
 
     } catch (error) {
         console.log("Database error while connection : ", error);
@@ -74,6 +80,11 @@ app.use(session({
         return res.render("home");
     })
 
+
+    app.get("/connexion", (req, res) => {
+        return res.render("connexion");
+    })
+
     // ####### POST REQUESTS #######
     app.post("/register", async(req, res) => {
         try {
@@ -87,9 +98,14 @@ app.use(session({
             const usernameClean = username.trim().toLowerCase();
 
             // Username check
-            const existingUser = User.findOne({usernameClean});
+            const existingUser = await User.findOne({username: usernameClean});
             if (existingUser) {
                 return res.status(400).send("Nom d'utilisateur déjà pris.");
+            }
+
+            const existingEmail = await User.findOne({email: email});
+            if (existingEmail) {
+                return res.status(400).send("Adresse email déjà reliée à un compte.");
             }
 
             // Hashing the password to increase security
@@ -101,16 +117,14 @@ app.use(session({
             
             // Saving some user informations into the session
             req.session.user = {
-                id : userData.insertedId, 
+                id : newUser._id, 
                 username: username, 
                 email: email
             };
             res.redirect("/");
 
         } catch (error) {
-            if (error.code === 11000) {
-                return res.status(400).send("Nom d'utilisateur déjà utilisé.");
-            }
+            if (error.code === 11000) return res.status(400).send("Nom d'utilisateur déjà utilisé.");
             console.log("Error while register for ",username," with the error : ", error);
             return res.status(500).send("Erreur serveur, veuillez réessayer plus tard.");
         }
@@ -123,18 +137,16 @@ app.use(session({
             if (!username || !password) return res.status(400).send("Veuillez remplir tous les champs.");
             
             const usernameClean = username.trim().toLowerCase();
-            const userFound =  await User.findOne({usernameClean});
-            if (!user) {
-                return res.status(400).send("Nom d'utilisateur ou mot de passe incorrect.");
-            }
-            const isPasswordValid = await bcrypt.compare(password, user.password);
-            if (!isPasswordValid) {
-                return res.status(400).send("Nom d'utilisateur ou mot de passe incorrect.");
-            }
+            const userFound =  await User.findOne({username: usernameClean});
+            if (!userFound) return res.status(400).send("Nom d'utilisateur ou mot de passe incorrect.");
+
+            const isPasswordValid = await bcrypt.compare(password, userFound.hash);
+            if (!isPasswordValid) return res.status(400).send("Nom d'utilisateur ou mot de passe incorrect.");
+            
             
             req.session.user = {
-                id: userFound.insertedId,
-                username: username,
+                id: userFound.__id,
+                username: userFound.username,
                 email: userFound.email,
             };
             
@@ -144,7 +156,7 @@ app.use(session({
             console.log("Error while login into ", username, " with the error : ", error);
             return res.status(500).send("Erreur serveur, veuillez réessayer plus tard.");
         }
-    })
+    });
 
     app.listen(8080);
 })();
