@@ -1,6 +1,6 @@
 var express = require("express");
 var session = require("express-session");
-var { MongoClient } = require("mongodb").MongoClient;
+const { MongoClient } = require("mongodb");
 var path = require("path");
 var bodyParser = require("body-parser");
 var bcrypt = require("bcrypt");
@@ -34,13 +34,18 @@ app.use(session({
     try {
         const client = new MongoClient('mongodb://localhost:27017');
         await client.connect();
+        console.log("Connected to database");
+
         const db = client.db('a10_final');
         users = db.collection("users");
         await users.createIndex({username:1}, {unique:true});
         foods = db.collection("foods");
         await foods.createIndex({name : 1});
+        console.log("Collections and indexes ready");
+
     } catch (error) {
-        console.log("Database error while connection : ", error)
+        console.log("Database error while connection : ", error);
+        process.exit(1);
     }
 
     // ####### MIDDLEWARES #######
@@ -65,5 +70,7 @@ app.use(session({
 
     // ####### POST REQUESTS #######
 
-    app.listen(8080);
+    app.listen(8080, () => {
+        console.log("Server started on http://localhost:8080");
+    });
 })();
