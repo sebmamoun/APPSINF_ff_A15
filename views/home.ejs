@@ -6,23 +6,14 @@
     <title>MyProt</title>
 </head>
     <body>
-        <table id="aliment-table">
-            <tr>
-                <th>Description</th>
-                <th>Proteine</th>
-                <th>Ajouté par</th>
-                <th>Date</th>
-            </tr>
-            <% foods.forEach(food => { %>
-                <tr>
-                    <td><%= food.name %></td>
-                    <td><%= food.proteine %> g</td>
-                    <td><%= food.user %></td>
-                    <td><%= food.formattedDate ? food.formattedDate : "" %>
-                    </td>
-                </tr>
-                <% }) %>
-        </table>
+        <div class="dropdown">
+            <button class="dropbtn" onclick="toggleMenu()">Menu</button>
+            <div class="dropdown-content" id="myDropdown">
+                <a href="/home">Mon Compte</a>
+                <a href="/login">Se Connecter</a>
+                <a href="/game">Jouer</a>
+            </div>
+        </div>
         <script src="/scripts/home.js"></script>
     </body>
 </html>

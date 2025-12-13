@@ -1,10 +1,12 @@
 var express = require("express");
 var session = require("express-session");
-const { MongoClient } = require("mongodb");
+var { MongoClient } = require("mongodb").MongoClient;
+var mongoose = require("mongoose");
 var path = require("path");
 var bodyParser = require("body-parser");
 var bcrypt = require("bcrypt");
 var validator = require("validator");
+const { name } = require("ejs");
 
 var app = express()
 app.set("view engine", "ejs");
@@ -25,36 +27,46 @@ app.use(session({
     }
 }));
 
+let User;
+let Food;
+
 (async () => {
-    let users;
-    let foods;
-
-
     // CONNECTION TO THE DATABASE, CREATION OF 2 COLLECTION AND SETTING 2 COLUMN SORT BY CROISSANT ORDER
     try {
-        const client = new MongoClient('mongodb://localhost:27017');
-        await client.connect();
-        console.log("Connected to database");
+        mongoose.connect('mongodb://localhost:27017/a15');
 
-        const db = client.db('a10_final');
-        users = db.collection("users");
-        await users.createIndex({username:1}, {unique:true});
-        foods = db.collection("foods");
-        await foods.createIndex({name : 1});
-        console.log("Collections and indexes ready");
+        const userSchema = new mongoose.Schema({
+            username:String,
+            email:String,
+            hash:String
+        });
+        User = mongoose.model('User', userSchema);
+
+        const foodSchema = new mongoose.Schema({
+            name:String,
+            description:String,
+            price:Number,
+            prot:Number,
+            glucides:Number,
+            lipides:Number,
+            calories:Number,
+            lastUpdate: {type:Date, default:Date.now}
+        });
+        Food = mongoose.model('Food', foodSchema);
 
     } catch (error) {
         console.log("Database error while connection : ", error);
-        process.exit(1);
     }
 
     // ####### MIDDLEWARES #######
     // CHECK IF THE USER IS CONNECTED 
-    function requireAuth(req, res, next) {
-        if (!req.session.user) {
-            return res.redirect("/account");
+    function requireAuth(page) {
+        return function (req, res, next) {
+            if (!req.session.user) {
+                return res.render("connexion");
+            }
+            next();
         }
-        next();
     }
 
     // SET THE USER FOR EVERY VIEW
@@ -64,24 +76,89 @@ app.use(session({
     })
 
     // ####### GET REQUESTS #######
-    app.get("/", async (req, res) => {
+    app.get("/", (req, res) => {
+        return res.render("home");
+    })
+
+
+    app.get("/connexion", (req, res) => {
+        return res.render("connexion");
+    })
+
+    // ####### POST REQUESTS #######
+    app.post("/register", async(req, res) => {
         try {
-            const foodsList = await foods.find({}).toArray();
-            foodsList.forEach(food => {
-                if (food.date) {
-                    food.formattedDate = new Date(food.date).toLocaleDateString("fr-FR");
-                }
-            });
-            return res.render("home", { foods: foodsList });
+            const { username, password, email } = req.body;
+            if (!username || !password || !email) return res.status(400).send("Veuillez remplir tous les champs.");
+
+            if (!validator.isEmail(email)) {
+                return res.status(400).send("Veuillez fournir une adresse email valide.");
+            }
+
+            const usernameClean = username.trim().toLowerCase();
+
+            // Username check
+            const existingUser = await User.findOne({username: usernameClean});
+            if (existingUser) {
+                return res.status(400).send("Nom d'utilisateur déjà pris.");
+            }
+
+            const existingEmail = await User.findOne({email: email});
+            if (existingEmail) {
+                return res.status(400).send("Adresse email déjà reliée à un compte.");
+            }
+
+            // Hashing the password to increase security
+            const hash = await bcrypt.hash(password, 12);
+
+            // Saving the user informations into the database
+            const newUser = User ({username, email, hash});
+            await newUser.save();
+            
+            // Saving some user informations into the session
+            req.session.user = {
+                id : newUser._id, 
+                username: username, 
+                email: email
+            };
+            res.redirect("/");
+
         } catch (error) {
-            console.log("Database error while fetching foods : ", error);
-            return res.render("home", { foods: [] });
+            if (error.code === 11000) return res.status(400).send("Nom d'utilisateur déjà utilisé.");
+            console.log("Error while register for ",username," with the error : ", error);
+            return res.status(500).send("Erreur serveur, veuillez réessayer plus tard.");
         }
     });
 
-    // ####### POST REQUESTS #######
+    app.post("/login", async(req, res) => {
+        try {
+            
+            const { username, password} = req.body;
+            if (!username || !password) return res.status(400).send("Veuillez remplir tous les champs.");
+            
+            const usernameClean = username.trim().toLowerCase();
+            const userFound =  await User.findOne({username: usernameClean});
+            if (!userFound) return res.status(400).send("Nom d'utilisateur ou mot de passe incorrect.");
+
+            const isPasswordValid = await bcrypt.compare(password, userFound.hash);
+            if (!isPasswordValid) return res.status(400).send("Nom d'utilisateur ou mot de passe incorrect.");
+            
+            
+            req.session.user = {
+                id: userFound.__id,
+                username: userFound.username,
+                email: userFound.email,
+            };
+            
+            return res.redirect("/");
+
+        } catch (error) {
+            console.log("Error while login into ", username, " with the error : ", error);
+            return res.status(500).send("Erreur serveur, veuillez réessayer plus tard.");
+        }
+    });
 
     app.listen(8080, () => {
-        console.log("Server started on http://localhost:8080");
+        console.log("Server is running on http://localhost:8080");
     });
 })();
