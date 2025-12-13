@@ -80,6 +80,18 @@ let Food;
         return res.render("home");
     })
 
+    app.get("/ajout", (req, res) => {
+        return res.render("ajout");
+    })
+
+    app.get("/profile", (req, res) => {
+        return res.render("profile");
+    })
+
+    app.get("/game", (req, res) => {
+        return res.render("game");
+    })
+
 
     app.get("/connexion", (req, res) => {
         return res.render("connexion");
