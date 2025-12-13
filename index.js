@@ -64,7 +64,7 @@ app.use(session({
     })
 
     // ####### GET REQUESTS #######
-    app.get("/", (req, res) => {
+    app.get("/", async (req, res) => {
         try {
             const foodsList = await foods.find({}).toArray();
             return res.render("home", { foods: foodsList });
