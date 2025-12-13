@@ -67,15 +67,16 @@ app.use(session({
     app.get("/", async (req, res) => {
         try {
             const foodsList = await foods.find({}).toArray();
+            foodsList.forEach(food => {
+                if (food.date) {
+                    food.formattedDate = new Date(food.date).toLocaleDateString("fr-FR");
+                }
+            });
             return res.render("home", { foods: foodsList });
         } catch (error) {
             console.log("Database error while fetching foods : ", error);
             return res.render("home", { foods: [] });
         }
-    });
-
-    app.get("/account", (req, res) => {
-        res.render("account", { error: null });
     });
 
     // ####### POST REQUESTS #######

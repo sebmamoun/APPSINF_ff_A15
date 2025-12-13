@@ -20,4 +20,4 @@ searchInput.addEventListener('input', () => {
             }
         rows[i].style.display = match ? '' : 'none';
     }
-});
+}); 

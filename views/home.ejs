@@ -5,7 +5,6 @@
     <link rel="stylesheet" href="/styles/style.css">
     <title>MyProt</title>
 </head>
-<script src="scripts/home.js"></script>
     <body>
         <table id="aliment-table">
             <tr>
@@ -19,14 +18,11 @@
                     <td><%= food.name %></td>
                     <td><%= food.proteine %> g</td>
                     <td><%= food.user %></td>
-                    <td>
-                        <%= food createAt
-                            ? new Date(food.createAt).toLocaleDateString("fr-FR")
-                            : "" %>
+                    <td><%= food.formattedDate ? food.formattedDate : "" %>
                     </td>
                 </tr>
-            <% }) %>
+                <% }) %>
         </table>
+        <script src="/scripts/home.js"></script>
     </body>
-
 </html>
