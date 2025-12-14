@@ -22,7 +22,12 @@ document.addEventListener("DOMContentLoaded", function() {
     return { description: data.description, proteine: data.proteine };
     }
     
+    //isHigher est true si on clique sur "Plus" et false si on clique sur "Moins"
 
+    //si bonne réponse, on incrémente le score et on met à jour les boîtes
+    //et on remplace la boîte de gauche par celle de droite et on génère une nouvelle boîte de droite
+    
+    //si mauvaise réponse, on affiche le score et on réinitialise le jeu
     async function handleGuess(isHigher) {
         const correct = (isHigher && window.leftFood.proteine > window.rightFood.proteine) ||
                         (!isHigher && window.leftFood.proteine < window.rightFood.proteine);

@@ -72,8 +72,14 @@ let Food;
     })
 
     // ####### GET REQUESTS #######
-    app.get("/", (req, res) => {
-        return res.render("home");
+    app.get("/", async (req, res) => {
+        try {
+            const foods  = await Food.find({}).sort({ description: 1 });
+            res.render("home", { foods });
+        } catch (error) {
+            console.log("Erreur lors de la récupération des aliments: ", error);
+            return res.status(500).send("Erreur serveur");
+        }
     })
 
     app.get("/ajout", (req, res) => {
