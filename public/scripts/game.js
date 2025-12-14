@@ -1,9 +1,12 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const box1 = document.getElementById("box1");
-    const box2 = document.getElementById("box2");
-    const box2Button = document.getElementById("box2-button");
+    const HigherBtn = document.getElementById("higher");
+    const LowerBtn = document.getElementById("lower");
 
-    box2Button.addEventListener("click", function() {
-        alert("You clicked on Box 2!");
+    HigherBtn.addEventListener("click", () => {
+        alert("You clicked Higher!");
+    });
+    
+    LowerBtn.addEventListener("click", () => {
+        alert("You clicked Lower!");
     });
 });

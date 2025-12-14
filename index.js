@@ -1,6 +1,5 @@
 var express = require("express");
 var session = require("express-session");
-var { MongoClient } = require("mongodb").MongoClient;
 var mongoose = require("mongoose");
 var path = require("path");
 var bodyParser = require("body-parser");
@@ -43,13 +42,10 @@ let Food;
         User = mongoose.model('User', userSchema);
 
         const foodSchema = new mongoose.Schema({
-            name:String,
             description:String,
-            price:Number,
-            prot:Number,
-            glucides:Number,
-            lipides:Number,
-            calories:Number,
+            proteine:Number,
+            user:String,
+            date:{type:Date, default:Date.now},
             lastUpdate: {type:Date, default:Date.now}
         });
         Food = mongoose.model('Food', foodSchema);
@@ -88,14 +84,36 @@ let Food;
         return res.render("profile");
     })
 
-    app.get("/game", (req, res) => {
-        return res.render("game");
-    })
+    // takes random foods from db to use in game
+    app.get("/game", async (req, res) => {
+        try {
+            const foods = await Food.aggregate([{ $sample: { size: 2 } }]);
+            if (foods.length < 2) {
+                return res.send("Aucune donné trouvée pour le jeu");
+            }
+            return res.render("game", { rightFood: foods[0], leftFood: foods[1] });}
+        catch (error) {
+            console.error("Erreur lors du chargement du jeu: ", error);
+            return res.status(500).send("Erreur serveur");
+        }
+    });
 
 
     app.get("/connexion", (req, res) => {
         return res.render("connexion");
     })
+
+    app.post("/ajout", async (req, res) => {
+        try {
+            const { description, proteine, user, date } = req.body;
+            const newFood = new Food ({description, proteine: Number(proteine), user, date: date ? new Date(date) : undefined});
+            await newFood.save();
+            res.redirect("/");
+        } catch (error) {
+            console.log("Erreur lors de l'ajout d'aliment", error);
+            return res.status(500).send("Erreur lors de l'ajout d'aliment");
+        }
+    });
 
     // ####### POST REQUESTS #######
     app.post("/register", async(req, res) => {
