@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="/css/game.css">
+        <link rel="stylesheet" href="/css/style.css">
+        <title>Higher or Lower?</title>
+    </head>
+    <body>
+        <header>
+            <a href="/">Accueil</a>
+            <a href="/ajout">Ajout</a>
+            <a href="/game">Jouer</a>
+            <a href="/connexion">Mon Compte</a>
+        </header>
+        <h1>Plus ou Moins protéiné?</h1>
+        <h3>Score: <span id="score">0</span></h3>
+        <div class ="container">
+            <div class="box1">
+                <h2><%= leftFood.description %></h2>
+                <p>Protéine: <%= leftFood.proteine %> g</p>
+            </div>
+
+            <div class="button-collumn">
+                <button id="higher">Plus que</button>
+                <button id="lower">Moins que</button>
+            </div>
+
+            <div class="box2">
+                <h2><%= rightFood.description %></h2>
+            </div>
+        </div>
+        <script>
+            window.leftFood = {
+                description: "<%= leftFood.description %>",
+                proteine: <%= leftFood.proteine %>
+            };
+            window.rightFood = {
+                description: "<%= rightFood.description %>",
+                proteine: <%= rightFood.proteine %>
+            };
+            window.score = 0;
+        </script>
+        <script src="/scripts/game.js"></script>
+    </body>
+</html>

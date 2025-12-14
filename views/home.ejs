@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <title>MyProt</title>
+</head>
+    <body>
+        <header>
+            <a href="/">Accueil</a>
+            <a href="/ajout">Ajout</a>
+            <a href="/game">Jouer</a>
+            <a href="/connexion">Mon Compte</a>
+        </header>
+        <h1>Aliments Répertoriés</h1>
+        <table>
+            <thread>
+                <tr>
+                    <th>Description</th>
+                    <th>Protéine (g)</th>
+                    <th>Ajouté par</th>
+                    <th>Date d'ajout</th>
+                </tr>
+            </thread>
+            <tbody>
+                <% if (foods.length == 0) { %>
+                    <tr>
+                        <td colspan="4">Aucun aliment répertorié.</td>
+                    </tr>
+                <% } else { %>
+                    <% foods.forEach(food => { %>
+                        <tr>
+                            <td><%= food.description %></td>
+                            <td><%= food.proteine %></td>
+                            <td><%= food.user %></td>
+                            <td><%= food.date ? food.date.toISOString().split('T')[0] : 'N/A' %></td>
+                        </tr>
+                    <% }) %>
+                <% } %>
+            </tbody>
+        </table>
+        <script src="/scripts/home.js"></script>
+    </body>
+</html>

@@ -1,9 +1,56 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const box1 = document.getElementById("box1");
-    const box2 = document.getElementById("box2");
-    const box2Button = document.getElementById("box2-button");
+    const leftbox = document.querySelector(".box1");
+    const rightbox = document.querySelector(".box2");
+    const HigherBtn = document.getElementById("higher");
+    const LowerBtn = document.getElementById("lower");
+    const scoreSpan = document.getElementById("score");
 
-    box2Button.addEventListener("click", function() {
-        alert("You clicked on Box 2!");
-    });
+
+    function updateScore() {
+        scoreSpan.textContent = window.score;
+    }
+    
+   function updateBoxes() {
+    leftbox.querySelector("h2").textContent = window.leftFood.description;
+    leftbox.querySelector("p").textContent = `Protein: ${window.leftFood.proteine} g`;
+    rightbox.querySelector("h2").textContent = window.rightFood.description;
+   }
+
+   async function getRandomFood() {
+    const response = await fetch("/random-food");
+    const data = await response.json();
+    return { description: data.description, proteine: data.proteine };
+    }
+    
+    //isHigher est true si on clique sur "Plus" et false si on clique sur "Moins"
+
+    //si bonne réponse, on incrémente le score et on met à jour les boîtes
+    //et on remplace la boîte de gauche par celle de droite et on génère une nouvelle boîte de droite
+    
+    //si mauvaise réponse, on affiche le score et on réinitialise le jeu
+    async function handleGuess(isHigher) {
+        const correct = (isHigher && window.leftFood.proteine > window.rightFood.proteine) ||
+                        (!isHigher && window.leftFood.proteine < window.rightFood.proteine);
+        if (correct) {
+            window.score++;
+            updateScore();
+            const newRight = await getRandomFood();
+            window.leftFood = window.rightFood;
+            window.rightFood = newRight;
+            updateBoxes();
+        } else {
+            alert(`Game Over! Votre score est de ${window.score}!`);
+            window.score = 0;
+            updateScore();
+            const newLeft = await getRandomFood();
+            const newRight = await getRandomFood();
+            window.leftFood = newLeft;
+            window.rightFood = newRight;
+            updateBoxes();
+        }
+    }
+    HigherBtn.addEventListener("click", () => handleGuess(true));
+    LowerBtn.addEventListener("click", () => handleGuess(false));
+    updateBoxes();
+    updateScore();
 });

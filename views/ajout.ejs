@@ -2,19 +2,26 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="/styles/style.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>ajout</title>
 </head>
 
 <body>
+    <header>
+        <a href="/">Accueil</a>
+        <a href="/ajout">Ajout</a>
+        <a href="/game">Jouer</a>
+        <a href="/connexion">Mon Compte</a>
+    </header>
     <div class="creat_inc_container container">
         <h3>Ajouter un nouvel aliment</h3>
-        <form action="/aliment" method="POST" class="form inc-form">
+        <form action="/ajout" method="POST" class="form inc-form">
             <div class="input-container">
                 <input type="text" name="description" placeholder="Description" class="input" required>
                 <input type="text" name="proteine" placeholder="Proteine" class="input" required>
             </div>
             <div class="input-container">
-                <input type="text" name="Ajouté_par" placeholder="Ajouté par" class="input" required>
+                <input type="text" name="user" placeholder="Ajouté par" class="input" required>
                 <input type="date" name="date" class="input">
             </div>
             <button type="submit" class="login-button">Envoyer</button>
