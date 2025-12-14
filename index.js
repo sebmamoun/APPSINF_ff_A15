@@ -101,10 +101,16 @@ let Food;
     // gets a random food to use in game
     app.get("/random-food", async (req, res) => {
         try {
-            const foods = await Food.aggregate([{ $sample: { size: 1 } }]);
+            const lastFoodId = req.session.lastFoodId;
+            const matchStage = lastFoodId ? { $match: { _id: { $ne: new mongoose.Types.ObjectId(lastFoodId) } } } : {$match: {} };
+            const foods = await Food.aggregate([
+                matchStage,
+                { $sample: { size: 1 } }
+            ]);
             if (foods.length === 0) {
-                return res.status(404).send("Aucun aliment trouvé");
-            } 
+                return res.status(404).send("Aucun aliment disponible.");
+            }
+            req.session.lastFoodId = foods[0]._id;
             return res.json(foods[0]);
         } catch (error) {
             console.error("Erreur lors de la récupération de l'aliment aléatoire: ", error);

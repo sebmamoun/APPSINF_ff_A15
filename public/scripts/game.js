@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const data = await response.json();
     return { description: data.description, proteine: data.proteine };
     }
+    
 
     async function handleGuess(isHigher) {
         const correct = (isHigher && window.leftFood.proteine > window.rightFood.proteine) ||
