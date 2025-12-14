@@ -12,8 +12,8 @@
             <a href="/game">Jouer</a>
             <a href="/connexion">Mon Compte</a>
         </header>
-        <script src="/scripts/game.js"></script>
-        <h1>Higher or Lower?</h1>
+        <h1>Plus ou Moins protéiné?</h1>
+        <h3>Score: <span id="score">0</span></h3>
         <div class ="container">
             <div class="box1">
                 <h2><%= leftFood.description %></h2>
@@ -21,13 +21,25 @@
             </div>
 
             <div class="button-collumn">
-                <button id="higher">Higher</button>
-                <button id="lower">Lower</button>
+                <button id="higher">Plus que</button>
+                <button id="lower">Moins que</button>
             </div>
 
             <div class="box2">
                 <h2><%= rightFood.description %></h2>
             </div>
         </div>
+        <script>
+            window.leftFood = {
+                description: "<%= leftFood.description %>",
+                proteine: <%= leftFood.proteine %>
+            };
+            window.rightFood = {
+                description: "<%= rightFood.description %>",
+                proteine: <%= rightFood.proteine %>
+            };
+            window.score = 0;
+        </script>
+        <script src="/scripts/game.js"></script>
     </body>
 </html>

@@ -98,6 +98,20 @@ let Food;
         }
     });
 
+    // gets a random food to use in game
+    app.get("/random-food", async (req, res) => {
+        try {
+            const foods = await Food.aggregate([{ $sample: { size: 1 } }]);
+            if (foods.length === 0) {
+                return res.status(404).send("Aucun aliment trouvé");
+            } 
+            return res.json(foods[0]);
+        } catch (error) {
+            console.error("Erreur lors de la récupération de l'aliment aléatoire: ", error);
+            return res.status(500).send("Erreur serveur");
+        }
+    });
+
 
     app.get("/connexion", (req, res) => {
         return res.render("connexion");
