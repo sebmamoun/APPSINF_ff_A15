@@ -57,10 +57,6 @@ function renderTable(data) {
         `;
         return;
     }
-    if (search.length > 20) {
-        searchInput.value = search.substring(0, 20);
-        return;
-    }
     data.forEach(food => {
         const tr = document.createElement("tr");
 
@@ -84,6 +80,11 @@ searchInput.addEventListener("input", () => {
 
     search = tokken(search);
 
+    if (search.length > 20) {
+        searchInput.value = search.substring(0, 20);
+        return;
+    }
+
     const docs = foods.map(f => // map loops over every element of an array
         tokken(f.description)
     );
@@ -104,6 +105,7 @@ searchInput.addEventListener("input", () => {
     }
     scores = scores.filter(f => f.score > 0).sort((a, b) => b.score - a.score);
     renderTable(scores);
+    
 });
 
 renderTable(foods);
