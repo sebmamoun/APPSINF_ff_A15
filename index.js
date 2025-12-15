@@ -109,10 +109,6 @@ let Food;
         return res.render("ajout");
     })
 
-    app.get("/profile", (req, res) => {
-        return res.render("profile");
-    })
-
     // takes random foods from db to use in game
     app.get("/game", async (req, res) => {
         try {
@@ -147,11 +143,48 @@ let Food;
         }
     });
 
-
     app.get("/connexion", (req, res) => {
         return res.render("connexion");
     })
 
+    app.get("/profile", requireAuth, async (req, res) => {
+        try {
+            const userId = req.session.user?._id;
+            if (!userId) return res.redirect("/connexion");
+
+            const start = new Date();
+            start.setHours(0, 0, 0, 0);
+            const end = new Date();
+            end.setHours(23, 59, 59, 999);
+
+            const totals = await Tracking.aggregate([
+            { $match: { user: new mongoose.Types.ObjectId(userId), date: { $gte: start, $lte: end } } },
+            { $lookup: { from: "foods", localField: "food", foreignField: "_id", as: "food" } },
+            { $unwind: "$food" },
+            {
+                $group: {
+                _id: null,
+                calories: { $sum: { $multiply: ["$food.calories", "$quantity"] } },
+                prot:     { $sum: { $multiply: ["$food.prot", "$quantity"] } },
+                glucides: { $sum: { $multiply: ["$food.glucides", "$quantity"] } },
+                lipides:  { $sum: { $multiply: ["$food.lipides", "$quantity"] } }
+                }
+            }
+            ]);
+
+            const macros = totals[0] ?? { calories: 0, prot: 0, glucides: 0, lipides: 0 };
+
+            const foods = await Tracking.find({ user: userId }).populate("food");
+
+            return res.render("profile", { aliments: foods, macros });
+
+        } catch (err) {
+            console.error("Profile error:", err);
+            return res.render("profile", { aliments: [], macros: { calories: 0, prot: 0, glucides: 0, lipides: 0 } });
+        }
+        });
+
+    // ####### POST REQUESTS #######
     app.post("/ajout", async (req, res) => {
         try {
             const { description, proteine, user, date } = req.body;
@@ -163,51 +196,13 @@ let Food;
             return res.status(500).send("Erreur lors de l'ajout d'aliment");
         }
     });
-    app.get("/profile", requireAuth, async (req, res) => {
-        const start = new Date();
-        start.setHours(0,0,0,0);
-        const end = new Date();
-        end.setHours(23,59,59,999);
-        const totals = await Tracking.aggregate([
-        {
-            $match: {
-            user: req.session.user._id,
-            date: { $gte: start, $lte: end }
-            }
-        },
-        {
-            $lookup: {
-            from: "foods",
-            localField: "food",
-            foreignField: "_id",
-            as: "food"
-            }
-        },
-        { $unwind: "$food" },
-        {
-            $group: {
-            _id: null,
-            calories: { $sum: { $multiply: ["$food.calories", "$quantity"] } },
-            prot:     { $sum: { $multiply: ["$food.prot", "$quantity"] } },
-            glucides: { $sum: { $multiply: ["$food.glucides", "$quantity"] } },
-            lipides:  { $sum: { $multiply: ["$food.lipides", "$quantity"] } }
-            }
-        }
-        ]);
 
-        const macros = totals[0] ?? { calories: 0, prot: 0, glucides: 0, lipides: 0 };
-        const foods = await Tracking
-            .find({ user: req.session.user._id })
-            .populate("food");
-
-        return res.render("profile", {aliments: foods, macros: macros});
-    })
-
-    // ####### POST REQUESTS #######
     app.post("/register", async(req, res) => {
         try {
             const { username, password, email } = req.body;
             if (!username || !password || !email) return res.status(400).send("Veuillez remplir tous les champs.");
+
+            if (username.length < 3) return res.status(400).send("Veuillez fournir un nom d'utilisateur ayant minimum 3 caractères.");
 
             if (!validator.isEmail(email)) {
                 return res.status(400).send("Veuillez fournir une adresse email valide.");
@@ -233,7 +228,7 @@ let Food;
             
             // Saving some user informations into the session
             req.session.user = {
-                id : newUser._id, 
+                _id : newUser._id, 
                 username: username, 
                 email: email
             };
@@ -260,13 +255,12 @@ let Food;
             if (!userFound || !userFound.hash) {
             return res.status(400).send("Nom d'utilisateur ou mot de passe incorrect.");
             }
-            if (!userFound) return res.status(400).send("Nom d'utilisateur ou mot de passe incorrect.");
 
             const isPasswordValid = await bcrypt.compare(password, userFound.hash);
             if (!isPasswordValid) return res.status(400).send("Nom d'utilisateur ou mot de passe incorrect.");
             
             req.session.user = {
-                id: userFound._id,
+                _id: userFound._id,
                 username: userFound.username,
                 email: userFound.email,
             };
