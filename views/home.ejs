@@ -12,17 +12,20 @@
             <a href="/ajout">Ajout</a>
             <a href="/game">Jouer</a>
             <a href="/connexion">Mon Compte</a>
+            <div class="search-container">
+                    <input placeholder="Recherche" type="search" class="input">
+            </div>
         </header>
         <h1>Aliments Répertoriés</h1>
         <table>
-            <thread>
+            <thead>
                 <tr>
                     <th>Description</th>
                     <th>Protéine (g)</th>
                     <th>Ajouté par</th>
                     <th>Date d'ajout</th>
                 </tr>
-            </thread>
+            </thead>
             <tbody>
                 <% if (foods.length == 0) { %>
                     <tr>
@@ -36,10 +39,13 @@
                             <td><%= food.user %></td>
                             <td><%= food.date ? food.date.toISOString().split('T')[0] : 'N/A' %></td>
                         </tr>
-                    <% }) %>
+                    <% }) %> <%#date look like "2024-10-12T00:00:00.000Z", so it remove things after the T%>
                 <% } %>
             </tbody>
         </table>
+        <script>
+            window.FOODS = <%- JSON.stringify(foods) %>;
+        </script>
         <script src="/scripts/home.js"></script>
     </body>
 </html>
