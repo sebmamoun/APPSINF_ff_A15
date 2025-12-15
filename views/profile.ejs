@@ -1,15 +1,67 @@
 <!DOCTYPE html>
-<html> 
+<html>
     <head>
-        <link rel="stylesheet" href="/css/style.css">
-        <title>Mon Profil - MyProt</title>
+        <meta charset="UTF-8">
+        <title>MyProt - Profile</title>
+        <link rel="stylesheet" href="/css/profile.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Anton&family=BBH+Hegarty&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/js-circle-progress/dist/circle-progress.min.js" type="module"></script>
+        <script src="/scripts/profile.js" defer></script>
+        <script>
+            const macros = <%- JSON.stringify(macros) %>;
+        </script>
+
     </head>
-        <body>
-            <header>
-                <a href="/">Accueil</a>
-                <a href="/ajout">Ajout</a>
-                <a href="/game">Jouer</a>
-                <a href="/connexion">Mon Compte</a>
-            </header>
-            </body>
+    <body>
+        <%- include('partials/header') %>
+        <main>
+            <section class="informations">
+                <div class="circles-container">
+                    <label for="calories-circle">Calories</label>
+                    <circle-progress max="100" value="60" text-format="percent" id="calories-circle"></circle-progress>
+                </div>
+                <div class="circles-container">
+                    <label for="glucides-circle">Glucides</label>
+                    <circle-progress max="100" value="60" text-format="percent" id="glucides-circle"></circle-progress>
+                </div>
+                <div class="circles-container">
+                    <label for="lipides-circle">Lipides</label>
+                    <circle-progress max="100" value="60" text-format="percent" id="lipides-circle"></circle-progress>
+                </div>
+                <div class="circles-container">
+                    <label for="proteines-circle">Proteines</label>
+                    <circle-progress max="100" value="60" text-format="percent" id="proteines-circle"></circle-progress>
+                </div>
+            </section>
+            <section class="list-foods">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prix</th>
+                            <th>Protéines</th>
+                            <th>Glucides</th>
+                            <th>Lipides</th>
+                            <th>Calories</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <% aliments.forEach(element => { %>
+                        <tr>
+                        <td><%= element.food.name %></td>
+                        <td><%= element.food.price %></td>
+                        <td><%= element.food.prot %></td>
+                        <td><%= element.food.glucides %></td>
+                        <td><%= element.food.lipides %></td>
+                        <td><%= element.food.calories %></td>
+                        </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+        <footer>&copy; MyProt 2025</footer>
+    </body>
 </html>
