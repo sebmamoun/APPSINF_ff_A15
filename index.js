@@ -188,7 +188,7 @@ let Food;
     app.post("/ajout", async (req, res) => {
         try {
             const { description, proteine, user, date } = req.body;
-            const newFood = new Food ({description, proteine: Number(proteine), user, date: date ? new Date(date) : undefined});
+            const newFood = new Food ({description, proteine: Number(proteine), user, date:new Date(date)});
             await newFood.save();
             res.redirect("/");
         } catch (error) {
