@@ -52,7 +52,7 @@ function renderTable(data) {
     if (data.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="4">Aucun résultat.</td> 
+                <td colspan="8">Aucun résultat.</td> 
             </tr>
         `;
         return;
@@ -61,11 +61,14 @@ function renderTable(data) {
         const tr = document.createElement("tr");
 
         tr.innerHTML = `
-            <td>${food.description}</td>
-            <td>${food.proteine}</td>
+            <td>${food.name}</td>
+            <td>${food.price}</td>
+            <td>${food.prot}</td>
+            <td>${food.glucides}</td>
+            <td>${food.lipides}</td>
+            <td>${food.calories}</td>
             <td>${food.user}</td>
-            <td>${food.date ? food.date.split("T")[0] : "N/A"}</td>
-        `; // date look like "2024-10-12T00:00:00.000Z", so it remove things after the T
+        `;
 
         tbody.appendChild(tr);
     });
@@ -86,7 +89,7 @@ searchInput.addEventListener("input", () => {
     }
 
     const docs = foods.map(f => // map loops over every element of an array
-        tokken(f.description)
+        tokken(f.name)
     );
 
     let scores = [];
@@ -94,14 +97,7 @@ searchInput.addEventListener("input", () => {
         const food = foods[i];
         const doc = docs[i];
         const score = tfIdfScore(search, doc, docs);
-        const foodWithScore = {
-            description: food.description,
-            proteine: food.proteine,
-            user: food.user,
-            date: food.date,
-            score: score
-        };
-    scores.push(foodWithScore);
+        scores.push({...food, score});
     }
     scores = scores.filter(f => f.score > 0).sort((a, b) => b.score - a.score);
     renderTable(scores);
