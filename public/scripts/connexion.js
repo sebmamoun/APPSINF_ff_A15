@@ -1,7 +1,7 @@
-const buttonSwitchRegister = document.getElementById("login-switch"); 
-const buttonSwitchLogin    = document.getElementById("register-switch"); 
+const buttonSwitchRegister = document.getElementById("login-switch");
+const buttonSwitchLogin = document.getElementById("register-switch");
 
-const sectionLogin    = document.querySelector("section.login");
+const sectionLogin = document.querySelector("section.login");
 const sectionRegister = document.querySelector("section.register");
 
 function showLogin() {
