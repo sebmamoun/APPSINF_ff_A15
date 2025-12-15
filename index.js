@@ -46,7 +46,7 @@ let Food;
 
         const foodSchema = new mongoose.Schema({
             name: {type: String, required: true},
-            description: {type: String, required:true},
+            user: { type: String, required: true},
             price:{type: Number, required: true},
             prot:{type: Number, required: true},
             glucides:{type: Number, required: true},
@@ -97,7 +97,7 @@ let Food;
     // ####### GET REQUESTS #######
     app.get("/", async (req, res) => {
         try {
-            const foods  = await Food.find({}).sort({ description: 1 });
+            const foods  = await Food.find({}).sort({ createdAt: -1 }); //newest first
             res.render("home", { foods });
         } catch (error) {
             console.log("Erreur lors de la récupération des aliments: ", error);
@@ -105,8 +105,8 @@ let Food;
         }
     })
 
-    app.get("/ajout", (req, res) => {
-        return res.render("ajout");
+    app.get("/ajout", requireAuth, (req, res) => {
+        return res.render("ajout", { user: req.session.user.username });
     })
 
     // takes random foods from db to use in game
@@ -185,10 +185,11 @@ let Food;
         });
 
     // ####### POST REQUESTS #######
-    app.post("/ajout", async (req, res) => {
+    app.post("/ajout", requireAuth, async (req, res) => {
         try {
-            const { description, proteine, user, date } = req.body;
-            const newFood = new Food ({description, proteine: Number(proteine), user, date: date ? new Date(date) : undefined});
+            const {name, price, prot, glucides, lipides, calories } = req.body;
+            const user = req.session.user.username;
+            const newFood = new Food ({name, price:Number(price),user, prot:Number(prot),glucides: Number(glucides), lipides: Number(lipides),calories: Number(calories)});
             await newFood.save();
             res.redirect("/");
         } catch (error) {

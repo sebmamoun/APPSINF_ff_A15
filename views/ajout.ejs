@@ -17,12 +17,16 @@
         <h3>Ajouter un nouvel aliment</h3>
         <form action="/ajout" method="POST" class="form inc-form">
             <div class="input-container">
-                <input type="text" name="description" placeholder="Description" class="input" required>
-                <input type="text" name="proteine" placeholder="Proteine" class="input" required>
+                <input type="text" name="name" placeholder="Nom de l'aliment" class="input" required>
+                <input type="number" name="price" placeholder="Prix (€)" class="input" step="0.01" required>
             </div>
             <div class="input-container">
-                <input type="text" name="user" placeholder="Ajouté par" class="input" required>
-                <input type="date" name="date" class="input">
+                <input type="number" name="prot" placeholder="Protéines /100g" class="input" step="0.01" required>
+                <input type="number" name="calories" placeholder="Calories /100g" class="input" step="0.01" required>
+            </div>
+            <div class="input-container">
+                <input type="number" name="glucides" placeholder="Glucides /100g" class="input" step="0.01" required>
+                <input type="number" name="lipides" placeholder="Lipides /100g" class="input" step="0.01" required>
             </div>
             <button type="submit" class="login-button">Envoyer</button>
         </form>

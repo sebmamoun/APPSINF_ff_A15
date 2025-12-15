@@ -20,10 +20,13 @@
         <table>
             <thead>
                 <tr>
-                    <th>Description</th>
-                    <th>Protéine (g)</th>
+                    <th>Nom</th>
+                    <th>Prix (€)</th>
+                    <th>Protéines /100g</th>
+                    <th>Glucides /100g</th>
+                    <th>Lipides /100g</th>
+                    <th>Calories /100g</th>
                     <th>Ajouté par</th>
-                    <th>Date d'ajout</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,12 +37,15 @@
                 <% } else { %>
                     <% foods.forEach(food => { %>
                         <tr>
-                            <td><%= food.description %></td>
-                            <td><%= food.proteine %></td>
+                            <td><%= food.name %></td>
+                            <td><%= food.price %></td>
+                            <td><%= food.prot %></td>
+                            <td><%= food.glucides %></td>
+                            <td><%= food.lipides %></td>
+                            <td><%= food.calories %></td>
                             <td><%= food.user %></td>
-                            <td><%= food.date ? food.date.toISOString().split('T')[0] : 'N/A' %></td>
                         </tr>
-                    <% }) %> <%#date look like "2024-10-12T00:00:00.000Z", so it remove things after the T%>
+                    <% }) %>
                 <% } %>
             </tbody>
         </table>
