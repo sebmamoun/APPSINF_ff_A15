@@ -15,7 +15,7 @@ function tfScore(word, doc) {
     }
     let count = 0;
     for (let i = 0; i < doc.length; i++) {
-        if (doc[i] === word) {
+        if (doc[i].startsWith(word)) {
             count++;
         }
     }
@@ -25,7 +25,7 @@ function tfScore(word, doc) {
 function idfScore(word, docs) {
     let docsWithWord = 0;
     for (let i = 0; i < docs.length; i++) {
-        if (docs[i].includes(word)) {
+        if (docs[i].some(w => w.startsWith(word))) {
             docsWithWord++;
         }
     }
