@@ -42,3 +42,32 @@ Ajout et retrait d'aliments à un suivi personnalisé
 Visibilité sur ses objectifs
 *Tri
 Tri sur les différents éléments du tableau principal
+
+##Base de données
+
+User Schema
+
+{
+username: {type: String, required: true, minlength: 3, unique: true},
+email: {type: String, required: true, unique: true}, 
+hash: {type: String, required: true},
+rank: {type: String, enum: ['user', 'admin'], default: 'user'},
+},
+{
+timestamps: true
+}
+
+Food Schema
+
+{
+    name: {type: String, required: true},
+    user: { type: String, required: true},
+    price:{type: Number, required: true},
+    prot:{type: Number, required: true},
+    glucides:{type: Number, required: true},
+    lipides:{type: Number, required: true},
+    calories:{type: Number, required: true},    
+},
+{
+    timestamps: true
+}
