@@ -7,14 +7,17 @@
     </head>
     <body>
         <header>
-            <%- include('partials/header') %>
+            <a href="/">Accueil</a>
+            <a href="/ajout">Ajout</a>
+            <a href="/game">Jouer</a>
+            <a href="/connexion">Mon Compte</a>
         </header>
         <h1>Plus ou Moins protéiné?</h1>
         <h3>Score: <span id="score">0</span></h3>
         <div class ="container">
             <div class="box1">
-                <h2><%= leftFood.description %></h2>
-                <p>Protéine: <%= leftFood.proteine %> g</p>
+                <h2><%= leftFood.name %></h2>
+                <p>Protéine: <%= leftFood.prot %> g</p>
             </div>
 
             <div class="button-collumn">
@@ -23,17 +26,17 @@
             </div>
 
             <div class="box2">
-                <h2><%= rightFood.description %></h2>
+                <h2><%= rightFood.name %></h2>
             </div>
         </div>
         <script>
             window.leftFood = {
-                description: "<%= leftFood.description %>",
-                proteine: <%= leftFood.proteine %>
+                name: "<%= leftFood.name %>",
+                prot: <%= leftFood.prot %>
             };
             window.rightFood = {
-                description: "<%= rightFood.description %>",
-                proteine: <%= rightFood.proteine %>
+                name: "<%= rightFood.name %>",
+                prot: <%= rightFood.prot %>
             };
             window.score = 0;
         </script>
