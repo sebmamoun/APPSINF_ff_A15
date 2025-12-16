@@ -11,15 +11,15 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
    function updateBoxes() {
-    leftbox.querySelector("h2").textContent = window.leftFood.description;
-    leftbox.querySelector("p").textContent = `Protein: ${window.leftFood.proteine} g`;
-    rightbox.querySelector("h2").textContent = window.rightFood.description;
+    leftbox.querySelector("h2").textContent = window.leftFood.name;
+    leftbox.querySelector("p").textContent = `Protéine: ${window.leftFood.prot} g`;
+    rightbox.querySelector("h2").textContent = window.rightFood.name;
    }
 
    async function getRandomFood() {
     const response = await fetch("/random-food");
     const data = await response.json();
-    return { description: data.description, proteine: data.proteine };
+    return { name: data.name, prot: data.prot };
     }
     
     //isHigher est true si on clique sur "Plus" et false si on clique sur "Moins"
@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", function() {
     
     //si mauvaise réponse, on affiche le score et on réinitialise le jeu
     async function handleGuess(isHigher) {
-        const correct = (isHigher && window.leftFood.proteine > window.rightFood.proteine) ||
-                        (!isHigher && window.leftFood.proteine < window.rightFood.proteine);
+        const correct = (isHigher && window.leftFood.prot > window.rightFood.prot) ||
+                        (!isHigher && window.leftFood.prot < window.rightFood.prot);
         if (correct) {
             window.score++;
             updateScore();
