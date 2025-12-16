@@ -1,0 +1,57 @@
+[{
+  "_id": {
+    "$oid": "6940c880716ba0052a23ecf1"
+  },
+  "name": "Poulet",
+  "user": "user",
+  "price": 1.2,
+  "prot": 22,
+  "glucides": 0,
+  "lipides": 2,
+  "calories": 110,
+  "createdAt": {
+    "$date": "2025-12-16T02:48:32.487Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-16T02:48:32.487Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6940c89b716ba0052a23ecf4"
+  },
+  "name": "Boeuf Haché",
+  "user": "user",
+  "price": 1.8,
+  "prot": 21,
+  "glucides": 0,
+  "lipides": 5,
+  "calories": 130,
+  "createdAt": {
+    "$date": "2025-12-16T02:48:59.601Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-16T02:48:59.601Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6940c8b1716ba0052a23ecf8"
+  },
+  "name": "Oeufs",
+  "user": "user",
+  "price": 0.4,
+  "prot": 13,
+  "glucides": 1,
+  "lipides": 11,
+  "calories": 155,
+  "createdAt": {
+    "$date": "2025-12-16T02:49:21.779Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-16T02:49:21.779Z"
+  },
+  "__v": 0
+}]

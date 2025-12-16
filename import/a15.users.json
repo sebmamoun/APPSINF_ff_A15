@@ -1,0 +1,32 @@
+[{
+  "_id": {
+    "$oid": "6940c80f716ba0052a23ece5"
+  },
+  "username": "admin",
+  "email": "admin@uclouvain.be",
+  "hash": "$2b$12$OUY4g2fCMXtE0Fy9i/L/hOcLxswrtgW2Bkx2SyL8XBowL3bwU6bBO",
+  "rank": "admin",
+  "createdAt": {
+    "$date": "2025-12-16T02:46:39.333Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-16T02:46:39.333Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6940c83c716ba0052a23ecec"
+  },
+  "username": "user",
+  "email": "user@uclouvain.be",
+  "hash": "$2b$12$3j8bi4paoYdZa5gCwzYAzOJOm1ETAhDWstPlg8DKxpNupU8LbylrC",
+  "rank": "user",
+  "createdAt": {
+    "$date": "2025-12-16T02:47:24.094Z"
+  },
+  "updatedAt": {
+    "$date": "2025-12-16T02:47:24.094Z"
+  },
+  "__v": 0
+}]

@@ -62,15 +62,6 @@ let Food;
         date: { type: Date, default: Date.now }
         }, { timestamps: true });
         Tracking = mongoose.model('Tracking', trackingSchema);
-        
-        const macroSchema = new mongoose.Schema({
-            user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-            calories : {type: Number, required: true},
-            prot : {type: Number, required: true},
-            glucides : {type: Number, required: true},
-            lipides  : {type: Number, required: true}
-        })
-        Macro = mongoose.model('Macro', macroSchema);
 
     } catch (error) {
         console.log("Database error while connection : ", error);
@@ -88,6 +79,11 @@ let Food;
         return res.redirect('/connexion');
     }
 
+    function requireAdmin(req, res, next) {
+        if (req.session.user?.rank === "admin") return next();
+        return res.status(403).send("Accès refusé");
+        }
+
     // SET THE USER FOR EVERY VIEW
     app.use((req, res, next) => {
         res.locals.user = req.session?.user || null;
@@ -99,6 +95,8 @@ let Food;
         try {
             const foods  = await Food.find({}).sort({ createdAt: -1 }); //newest first
             res.render("home", { foods });
+
+
         } catch (error) {
             console.log("Erreur lors de la récupération des aliments: ", error);
             return res.status(500).send("Erreur serveur");
@@ -174,7 +172,10 @@ let Food;
 
             const macros = totals[0] ?? { calories: 0, prot: 0, glucides: 0, lipides: 0 };
 
-            const foods = await Tracking.find({ user: userId }).populate("food");
+            const foods = await Tracking.find({
+                user: userId,
+                date: { $gte: start, $lte: end }
+                }).populate("food");
 
             return res.render("profile", { aliments: foods, macros });
 
@@ -185,6 +186,60 @@ let Food;
         });
 
     // ####### POST REQUESTS #######
+    app.post("/delete_track", async(req, res) => {
+        try{
+            const { trackingId } = req.body;
+
+            const userId = req.session.user._id;
+
+            await Tracking.deleteMany({
+            _id: trackingId,
+            user: userId
+            });
+
+            return res.redirect("/profile");
+        } catch (error) {
+            console.log("Erreur lors de la suppression du tracking : ", error);
+            return res.status(500).send("Erreur lors de la suppression du tracking");
+        }
+    });
+
+    app.post("/logout", (req, res) => {
+        req.session.destroy();
+        return res.redirect("/");
+
+    });
+
+    app.post("/add_tracking", requireAuth, async(req, res) => {
+        try {
+            const { foodId, foodQuantity } = req.body;
+
+            const quantityGrams = Number(foodQuantity);
+            if (!Number.isFinite(quantityGrams) || quantityGrams <= 0) {
+            return res.status(400).send("Quantité invalide.");
+            }
+
+            const quantityFactor = quantityGrams / 100;
+
+            const food = await Food.findById(foodId).select("_id");
+            if (!food) {
+            return res.status(404).send("Aliment introuvable.");
+            }
+
+            await Tracking.create({
+            user: req.session.user._id,
+            food: food._id,
+            quantity: quantityFactor
+            });
+
+            return res.redirect("/");
+
+        } catch (error) {
+            console.log("Erreur lors de l'ajout au tracking : ", error);
+            return res.status(500).send("Erreur lors de l'ajout au tracking");
+        }
+        });
+
     app.post("/ajout", requireAuth, async (req, res) => {
         try {
             const {name, price, prot, glucides, lipides, calories } = req.body;
@@ -231,10 +286,11 @@ let Food;
             req.session.user = {
                 _id : newUser._id, 
                 username: username, 
-                email: email
+                email: email,
+                rank: 'user'
             };
 
-            const redirectTo = req.session.direction || '/profile';
+            const redirectTo = req.session.direction || '/';
             delete req.session.direction;
 
             return res.redirect(redirectTo);
@@ -264,9 +320,10 @@ let Food;
                 _id: userFound._id,
                 username: userFound.username,
                 email: userFound.email,
+                rank: userFound.rank
             };
 
-            const redirectTo = req.session.direction || '/profile';
+            const redirectTo = req.session.direction || '/';
             delete req.session.direction;
 
             return res.redirect(redirectTo);

@@ -1,8 +1,12 @@
-<header>
-    <h1>MyProt</h1>
-    <nav>
-        <a href="/">Accueil</a>
-        <a href="/game">Jeux</a>
-        <a href="/profile">Profile</a>
-    </nav>
-</header>
+<nav>
+  <a href="/">Accueil</a>
+  <a href="/ajout">Ajout</a>
+  <a href="/game">Jouer</a>
+  <a href="/profile">Mon Compte</a>
+  <input placeholder="Recherche" type="search" id="searchInput">
+</nav>
+<% if (user) { %>
+  <form action="/logout" method="POST">
+    <button type="submit" id="logout-button">Se déconnecter</button>
+  </form>
+<% } %>

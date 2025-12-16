@@ -1,6 +1,8 @@
 const foods = window.FOODS || []; // window makes the transfer of data from ejs to js
-const searchInput = document.querySelector(".input");
+const searchInput = document.getElementById("searchInput");
 const tbody = document.querySelector("tbody");
+const isAdmin = window.USER?.rank === "admin";
+
 
 function tokken (text){
     return text.toLowerCase().replace(/[^a-z\s]/g, "").split(/\s+/).filter(Boolean); 
@@ -47,6 +49,7 @@ function tfIdfScore(words, doc, docs) {
 }
 
 function renderTable(data) {
+
     tbody.innerHTML = ""; //remove all existing rows
     // show no result when no result
     if (data.length === 0) {
@@ -59,7 +62,6 @@ function renderTable(data) {
     }
     data.forEach(food => {
         const tr = document.createElement("tr");
-
         tr.innerHTML = `
             <td>${food.name}</td>
             <td>${food.price}</td>
@@ -68,6 +70,22 @@ function renderTable(data) {
             <td>${food.lipides}</td>
             <td>${food.calories}</td>
             <td>${food.user}</td>
+            <td>
+                <form action="/add_tracking" method="post">
+                    <input type="hidden" name="foodId" value="${food._id}">
+                    <input type="number" name="foodQuantity" placeholder="Quantité en grammes" min="1" required>
+                    <button type="submit" id="plus-tracking">+</button>
+                </form>
+            </td>
+            ${isAdmin ? `
+            <td>
+            <form action="/delete_food" method="post"
+                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet aliment ?');">
+                <input type="hidden" name="foodId" value="${food._id}">
+                <button type="submit">Supprimer</button>
+            </form>
+            </td>
+        ` : ""}
         `;
 
         tbody.appendChild(tr);
@@ -75,18 +93,20 @@ function renderTable(data) {
 }
 
 searchInput.addEventListener("input", () => {
-    let search = searchInput.value.trim(); // trim removes extra space at the end and beginning
-    if (search === "") {
+    
+    let searchString = searchInput.value.trim(); // trim removes extra space at the end and beginning
+    
+    if (searchString === "") {
         renderTable(foods); //render the full table
         return; // stop the fonction
     }
 
-    search = tokken(search);
-
-    if (search.length > 20) {
+    if (searchString.length > 20) {
         searchInput.value = search.substring(0, 20);
         return;
     }
+
+    const search = tokken(searchString);
 
     const docs = foods.map(f => // map loops over every element of an array
         tokken(f.name)
@@ -105,3 +125,34 @@ searchInput.addEventListener("input", () => {
 });
 
 renderTable(foods);
+
+// #######################################
+// #          TRI FUNCTION              #
+// ######################################
+
+let sortDirection = {};
+
+window.sortTable = function sortTable(columnIndex, type = 'string') {
+  const table = document.getElementById("foodTable");
+  if (!table) return;
+
+  const tbody = table.tBodies[0];
+  const rows = Array.from(tbody.rows);
+
+  sortDirection[columnIndex] = !sortDirection[columnIndex];
+  const dir = sortDirection[columnIndex] ? 1 : -1;
+
+  rows.sort((a, b) => {
+    let valA = a.cells[columnIndex]?.innerText.trim() ?? "";
+    let valB = b.cells[columnIndex]?.innerText.trim() ?? "";
+
+    if (type === "number") {
+      valA = parseFloat(valA.replace(",", ".")) || 0;
+      valB = parseFloat(valB.replace(",", ".")) || 0;
+    }
+
+    return valA > valB ? dir : valA < valB ? -dir : 0;
+  });
+
+  rows.forEach(r => tbody.appendChild(r));
+};

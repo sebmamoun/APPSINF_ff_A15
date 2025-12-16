@@ -1,32 +1,32 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/home.css">
-    <title>MyProt</title>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <title>MyProt</title>
+        <link rel="stylesheet" href="/css/style.css">
+        <script src="/scripts/home.js" defer></script>
+        <script>window.FOODS = <%- JSON.stringify(foods) %>;</script>
+        <script>window.USER = <%- JSON.stringify(user || null) %>;</script>
+    </head>
     <body>
         <header>
-            <a href="/">Accueil</a>
-            <a href="/ajout">Ajout</a>
-            <a href="/game">Jouer</a>
-            <a href="/connexion">Mon Compte</a>
-            <div class="search-container">
-                    <input placeholder="Recherche" type="search" class="input">
-            </div>
+            <%- include('partials/header') %>
         </header>
         <h1>Aliments Répertoriés</h1>
-        <table>
+        <table id="foodTable">
             <thead>
                 <tr>
-                    <th>Nom</th>
-                    <th>Prix (€)</th>
-                    <th>Protéines /100g</th>
-                    <th>Glucides /100g</th>
-                    <th>Lipides /100g</th>
-                    <th>Calories /100g</th>
-                    <th>Ajouté par</th>
+                    <th onclick="sortTable(0)">Nom</th>
+                    <th onclick="sortTable(1, 'number')">Prix (€)</th>
+                    <th onclick="sortTable(2, 'number')">Protéines /100g</th>
+                    <th onclick="sortTable(3, 'number')">Glucides /100g</th>
+                    <th onclick="sortTable(4, 'number')">Lipides /100g</th>
+                    <th onclick="sortTable(5, 'number')">Calories /100g</th>
+                    <th onclick="sortTable(6)">Ajouté par</th>
+                    <th>Quantité (Tracking)</th>
+                    <% if (user && user.rank === "admin") { %>
+                        <th>Suppression</th>
+                    <% } %>
                 </tr>
             </thead>
             <tbody>
@@ -44,14 +44,18 @@
                             <td><%= food.lipides %></td>
                             <td><%= food.calories %></td>
                             <td><%= food.user %></td>
+                            <td>
+                                <form action="/add_tracking" method="post">
+                                    <input type="hidden" name="foodId" value="<%= food._id %>">
+                                    <input type="number" name="foodQuantity" placeholder="Quantité en grammes" min="1" required>
+                                    <button type="submit">+</button>
+                                </form>
+                            </td>
                         </tr>
                     <% }) %>
                 <% } %>
             </tbody>
         </table>
-        <script>
-            window.FOODS = <%- JSON.stringify(foods) %>;
-        </script>
-        <script src="/scripts/home.js"></script>
+        
     </body>
 </html>
